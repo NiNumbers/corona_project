@@ -6,28 +6,38 @@ ui <- fluidPage(
   # input field
   wellPanel(
     tags$h2("Daily COVID-19 cases"),
-    fluidRow(),
-    tags$h4("Choose country"),
     fluidRow(
-      actionButton(inputId = "swiss", label = "Switzerland"),
-      actionButton(inputId = "german", label = "Germany"),
-      actionButton(inputId = "italy", label = "Italy"),
-      actionButton(inputId = "usa", label = "USA")
+      column(6, 
+        tags$h4("Choose country"),
+        actionButton(inputId = "swiss", label = "Switzerland"),
+        actionButton(inputId = "german", label = "Germany"),
+        actionButton(inputId = "italy", label = "Italy"),
+        actionButton(inputId = "usa", label = "USA")
       ),
-    tags$h4("Choose scale"),
-    fluidRow(
-      actionButton(inputId = "log", label = "log-Plot"),
-      actionButton(inputId = "lin", label = "linear-Plot")
-        ),
-    tags$h4("Choose loess faktor"),
-    fluidRow(
-      checkboxInput(inputId = "l_yes", label = "Show loess line", TRUE)
+      column(4, 
+        tags$h4("Choose scale"),
+        actionButton(inputId = "log", label = "log-Plot"),
+        actionButton(inputId = "lin", label = "linear-Plot")
+      )
     ),
-      sliderInput(inputId = "smooth", label = " ", 
+    fluidRow(
+      column(6,
+        tags$h4("Choose loess faktor")
+      )
+    ),
+    fluidRow(
+      column(6, 
+        sliderInput(inputId = "smooth", label = " ", 
                   value = 0.5, min = 0.1, max = 0.9)
+        ),
+      column(4,
+        checkboxInput(inputId = "l_yes", label = "Show loess line", TRUE)
+      )
+    )
   ),
   # show results  
-  plotOutput("show")
+  plotOutput("show_all"),
+  plotOutput("show_zoom")
 )
 
 server <- function(input, output){
@@ -51,7 +61,7 @@ server <- function(input, output){
                             {rv$title <- "USA"}, 
                             {rv$datum <- corona_US$datum}))
 
-  output$show <- renderPlot({
+  output$show_all <- renderPlot({
     plot(rv$datum, rv$data, log = rv$scal, ylab = rv$lab, xlab = "", 
          main = rv$title, type = "h",lwd = 3, lend = 1, col = "darkgrey")
       if (input$l_yes == TRUE){
@@ -60,6 +70,18 @@ server <- function(input, output){
                                    family = "symmetric", span = input$smooth)), 
                   col = "red", lty = 2, lwd = 2)
       }
+  })
+  output$show_zoom <- renderPlot({
+    plot(rv$datum[(length(rv$data)-21):length(rv$data)], 
+         rv$data[(length(rv$data) - 21):length(rv$data)], log = rv$scal, 
+         ylab = rv$lab, xlab = "",          main = "3 weeks zoom", type = "h",
+         lwd = 3, lend = 1, col = "darkgrey")
+    if (input$l_yes == TRUE){
+      lines(x = rv$datum, 
+            y = fitted(loess(rv$data ~ as.numeric(time(rv$datum)), 
+                             family = "symmetric", span = input$smooth)), 
+            col = "red", lty = 2, lwd = 2)
+    }
   })
 }
 
