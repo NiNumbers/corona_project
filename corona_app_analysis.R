@@ -43,14 +43,12 @@ pred$fit
 par(mfrow = c(1,1))
 plot(x = as.Date(model_data$datum, origin="1970-01-01"),y = model_data$active_apps, 
      xlim = c(as.Date("2020-06-25"), as.Date("2020-07-10")), ylim = c(550000, 1500000),
-     xlab = "Datum", ylab = "Active Apps")
+     xlab = "Datum", ylab = "Active Apps", main = "standard model")
 abline(fit.app)
 points(pred$datum, pred$fit, col = "red")
 
 # ----- fit log ----
 model_data$log <- log(model_data$active_apps)
-
-plot(model_data$datum, model_data$log)
 
 fit.applog <- lm(log ~datum, data = model_data)
 summary(fit.applog)
@@ -64,6 +62,6 @@ pred <- data.frame(ziel, predict(fit.applog, newdata = ziel, interval = "confide
 par(mfrow = c(1,1))
 plot(x = as.Date(model_data$datum, origin="1970-01-01"), y = model_data$log, 
      xlim = c(as.Date("2020-06-25"), as.Date("2020-07-10")), ylim = c(13, 14.5),
-     xlab = "Datum", ylab = "Active Apps")
+     xlab = "Datum", ylab = "Active Apps", main = "Log model")
 abline(fit.applog)
 points(pred$datum, pred$fit, col = "red")
