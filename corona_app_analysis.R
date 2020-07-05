@@ -1,5 +1,6 @@
 # load libraries, functions
 load("resplot.rda")
+library(forecast)
 
 # load and prepare data
 load("corona_app.RData")
@@ -22,7 +23,7 @@ model_data$datum <- as.numeric(as.Date(model_data$datum, "%Y%m/%d"))
 str(model_data)
 
 # exclude inicial installations
-model_data <- model_data[-c(1), -c(3)]
+# model_data <- model_data[-c(1), -c(3)]
 
 # fit simple
 fit.app <- lm(active_apps ~ datum, data = model_data)
@@ -65,3 +66,31 @@ plot(x = as.Date(model_data$datum, origin="1970-01-01"), y = model_data$log,
      xlab = "Datum", ylab = "Active Apps", main = "Log model")
 abline(fit.applog)
 points(pred$datum, pred$fit, col = "red")
+
+# ------ fit exp as data is not exponential but log distributed-----
+
+model_data$expdata <- exp((model_data$active_apps)/1000000)
+fit.appexp <- lm(expdata ~datum, data = model_data)
+summary(fit.appexp)
+
+plot(model_data$datum, model_data$expdata)
+abline(fit.appexp)
+
+ziel <- ziel
+pred <- data.frame(ziel, predict(fit.appexp, newdata = ziel, interval = "confidence", level = 0.95))
+
+par(mfrow = c(1,1))
+plot(x = as.Date(model_data$datum, origin="1970-01-01"), y = model_data$expdata, 
+     xlim = c(as.Date("2020-06-25"), as.Date("2020-07-10")), ylim = c(1.7, 3),
+     xlab = "Datum", ylab = "Active Apps", main = "exp model")
+abline(fit.appexp)
+points(pred$datum, pred$fit, col = "red")
+
+# ----- Zeitreihenanalyse ------
+ts.data <- ts(app_data$active_apps, start = c(2020, as.numeric(format(app_data$datum[1], "%j"))), frequency = 365)
+ts.data
+
+tsdisplay(ts.data)
+fit.temp <- ses(ts.data, h = 2)
+plot(forecast(fit.temp))
+summary(fit.temp)
