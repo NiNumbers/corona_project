@@ -43,7 +43,7 @@ pred$fit
 
 par(mfrow = c(1,1))
 plot(x = as.Date(model_data$datum, origin="1970-01-01"),y = model_data$active_apps, 
-     xlim = c(as.Date("2020-06-25"), as.Date("2020-07-10")), ylim = c(550000, 1500000),
+     xlim = c(as.Date("2020-06-25"), Sys.Date()), ylim = c(550000, 1500000),
      xlab = "Datum", ylab = "Active Apps", main = "standard model")
 abline(fit.app)
 points(pred$datum, pred$fit, col = "red")
@@ -62,7 +62,7 @@ pred <- data.frame(ziel, predict(fit.applog, newdata = ziel, interval = "confide
 
 par(mfrow = c(1,1))
 plot(x = as.Date(model_data$datum, origin="1970-01-01"), y = model_data$log, 
-     xlim = c(as.Date("2020-06-25"), as.Date("2020-07-10")), ylim = c(13, 14.5),
+     xlim = c(as.Date("2020-06-25"), Sys.Date()), ylim = c(13, 14.5),
      xlab = "Datum", ylab = "Active Apps", main = "Log model")
 abline(fit.applog)
 points(pred$datum, pred$fit, col = "red")
@@ -81,7 +81,7 @@ pred <- data.frame(ziel, predict(fit.appexp, newdata = ziel, interval = "confide
 
 par(mfrow = c(1,1))
 plot(x = as.Date(model_data$datum, origin="1970-01-01"), y = model_data$expdata, 
-     xlim = c(as.Date("2020-06-25"), as.Date("2020-07-10")), ylim = c(1.7, 3),
+     xlim = c(as.Date("2020-06-25"), Sys.Date()), ylim = c(1.7, 3),
      xlab = "Datum", ylab = "Active Apps", main = "exp model")
 abline(fit.appexp)
 points(pred$datum, pred$fit, col = "red")
