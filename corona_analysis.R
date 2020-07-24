@@ -1,3 +1,9 @@
+# Mittelwert ueber die letzten Tage
+mean(corona_CH$CHtaegl[c((length(corona_CH$datum)-14):length(corona_CH$datum))])
+
+# Median
+median(corona_CH$CHtaegl[c((length(corona_CH$datum)-14):length(corona_CH$datum))])
+
 # Residuenanalyse
 par(mfrow = c(2,1))
 CHtaegl_rest <- CHtaegl - CHtaegl_loess
