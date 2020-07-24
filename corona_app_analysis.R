@@ -6,6 +6,13 @@ library(forecast)
 load("corona_app.RData")
 str(app_data)
 
+# -------- percentage of covidcode per cases --------
+mean(covidcodes_data$percentage)
+median(covidcodes_data$percentage)
+par(mfrow = c(1,1))
+plot(covidcodes_data$datum, covidcodes_data$percentage, type = "h", xlab = "Datum",
+     ylab = "Anteil an Fällen mit ausgelöstem Covidcode")
+
 # ----- percentage of Users -----
 # Assumptions: 
 smartph <- 0.78  # 80% of all swiss residents use a smartphone 

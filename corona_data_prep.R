@@ -12,9 +12,8 @@ app_data_old <- data.frame(datum = seq(as.Date("2020/06/25"),
                        active_apps_old = active_apps_old)
 # --------- neue Berechnungsmethode -----------
 active_apps <- c(1150000)
-app_data <- data.frame(datum = seq(as.Date("2020/07/22"), 
-                                       (as.Date("2020/07/22")+(length(active_apps))-1), "days"), 
-                           active_apps = active_apps)
+covidcodes = c(rep(0, 6), 5, 11, 14, 11, 2, 14, 13, 11, 16, 8, 8, 2, 5, 15, 15, 18, 8, 6, 4, 6, 18)
+
 # ---------- Fallzahlen dataframe -------------
 corona_kum <- data.frame(datum = seq(as.Date("2020/02/26"), Sys.Date(), "days"))
 dauer <- length(corona_kum$datum)
@@ -131,10 +130,19 @@ corona_US <- data.frame(datum = seq(as.Date("2020/02/24"), Sys.Date(), "days"))
 corona_US$USkum <- USkum
 corona_US$UStaegl <- UStaegl
 
+# ---------------- covid app dataframes erstellen ------------- 
+app_data <- data.frame(datum = seq(as.Date("2020/07/22"), 
+                                   (as.Date("2020/07/22")+(length(active_apps))-1), "days"), 
+                       active_apps = active_apps)
+covidcodes_data <- data.frame(datum = seq(as.Date("2020/06/25"), 
+                                          (as.Date("2020/06/25")+(length(covidcodes))-1), "days"), 
+                              covidcodes = covidcodes, 
+                              faelle_CH = corona_CH$CHtaegl[121:(120+length(covidcodes))],
+                              percentage = round(covidcodes/covidcodes_data$faelle_CH, 2))
 # ---------------- save Data ---------
 # for shiny app
 save(corona_DE, corona_IT, corona_US, corona_CH, file = "corona_shiny.RData")
 # for analysing app_data
-save(app_data, file = "corona_app.RData")
+save(app_data, covidcodes_data, file = "corona_app.RData")
 # all data
 save.image(file = "corona_all_data.RData")
