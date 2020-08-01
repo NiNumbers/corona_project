@@ -1,5 +1,6 @@
 # library laden
 library(svDialogs) #fuer pop up message
+library(readxl) # excel lesen
 
 # ---------- mobile app dataframe  -----------
 # Quelle: https://www.experimental.bfs.admin.ch/expstat/de/home/innovative-methoden/swisscovid-app-monitoring.html
@@ -11,47 +12,33 @@ app_data_old <- data.frame(datum = seq(as.Date("2020/06/25"),
                                    (as.Date("2020/06/25")+(length(active_apps_old))-1), "days"), 
                        active_apps_old = active_apps_old)
 # --------- neue Berechnungsmethode -----------
-active_apps <- c(1150000, 1160000, 1200000, 1190000)
-covidcodes = c(rep(0, 6), 5, 11, 14, 11, 2, 14, 13, 11, 16, 8, 8, 2, 5, 15, 15, 9, 8, 6, 4, 6, 18, 11)
+active_apps <- c(1150000, 1160000, 1200000, 1190000, 1200000, 1200000, 1200000, 1200000, 
+                 1220000)
+covidcodes = c(rep(0, 6), 5, 11, 14, 11, 2, 14, 13, 11, 16, 8, 8, 2, 5, 15, 15, 9, 8, 
+               6, 4, 6, 18, 11, 15, 10, 8, 7, 12, 20, 17)
+
+# --------- BAG Excel auslesen ------------
+CH_data <- read_excel("200325_Datengrundlage_Grafiken_COVID-19-Bericht.xlsx", 
+                      sheet = "COVID19 Zahlen", range = cell_limits(c(7, 1), c(NA, NA)),
+                      col_names = TRUE)
 
 # ---------- Fallzahlen dataframe -------------
-corona_kum <- data.frame(datum = seq(as.Date("2020/02/26"), Sys.Date(), "days"))
+corona_kum <- data.frame(datum = seq(as.Date("2020/02/24"), Sys.Date(), "days"))
 dauer <- length(corona_kum$datum)
-corona_kum$day <- rep(c("Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag", 
-                        "Montag", "Dienstag"), length.out = dauer)
+corona_kum$day <- rep(c("Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"), length.out = dauer)
 
-# Quelle: bis ca. 19. März: Tagi, Rest BAG
-# ------- erste 152 Tageszahlen -------
-CHkum <- c(1, 8, 12, 21, 27, 42, 58, 90, 116, 210, 264, 337, 389, 509, 645, 858, 1125, 1359, 1650, 2200, 2650, 3028, 
-           3888, 4840, 6113, 7014, 8060, 8836, 9765, 10714, 12161, 13213, 14336, 15475,  16176, 17139, 18267, 19303, 
-           20278, 21100, 21652, 22242, 22789, 23574, 24308, 24900, 25300, 25580, 25834, 26336, 26732, 27078, 27404, 
-           27740, 27944, 28063, 28268, 28496, 28677, 28894, 29061, 29164, 29264, 29407, 29586, 29705, 29817, 29905, 
-           29981, 30009, 30060, 30126, 30207, 30251, 30305, 30344, 30380, 30413, 30463, 30514, 30572, 30587, 30597, 
-           30618, 30658, 30694, 30707, 30725, 30736, 30746, 30761, 30776, 30796, 30828, 30845, 30862, 30871, 30874, 
-           30893, 30913, 30936, 30956, 30965, 30972, 30988, 31011, 31044, 31063, 31094, 31117, 31131, 31146, 31183, 
-           31200, 31217, 31243, 31292, 31310, 31332, 31376, 31428, 31486, 31555, 31617, 31652, 31714, 31851, 31967,
-           32101, 32198,32268, 32315, 32369, 32498, 32586, 32690, 32798, 32883, 32946, 33016, 33148, 33290, 33382,
-           33492, 33591, 33634, 33742, 33883, 34000, 34154, 34302, 34412) 
-# --------- neueste Tageszahlen ----------
-CHkum <- append(CHkum, c(34477))
+verstorbenCHkum <- CH_data$`Todesfälle pro Tag, kumuliert`
 
-# --------------- erste 131 Todeszahlen -----------
-verstorbenCHkum <- c(19, 21, 33, 43, 56, 60, 66, 86, 103, 161, 197, 235, 257, 295, 373, 378, 432, 484, 540, 559, 584, 641, 
-                     705, 756, 805, 831, 858, 885, 900, 973, 1017, 1059, 1111, 1135, 1142, 1187, 1217, 1268, 1309, 1329, 1337, 
-                     1353, 1380, 1408, 1423, 1435, 1467, 1473, 1477, 1483, 1505, 1518, 1526, 1532, 1538, 1543, 1561, 1564, 
-                     1589, 1595, 1602, 1603, 1603, 1614, 1630, 1638, 1638, 1641, 1641, 1642, 1648, 1649, 1655, 1657,  1657,
-                     1657, 1657, 1657, 1660, 1660, 1660, 1661, 1661, 1661, 1663, 1675,1675, 1677, 1677, 1677, 1677, 1678,
-                     1678, 1678, 1680, 1680, 1680, 1680, 1680, 1682, 1682, 1682, 1682, 1682, 1682, 1684, 1685, 1686, 1686,
-                     1686, 1686, 1686, 1686, 1686, 1686, 1686, 1686, 1686, 1686, 1688, 1688, 1688, 1688, 1688, 1688, 1691,
-                     1693, 1694, 1700, 1700, 1701)
-# ------ neueste Toteszahlen --------
-verstorbenCHkum <- append(verstorbenCHkum, c(1701))
+# ---------- test if data is up to date --------
+if (length(CH_data$Datum) != dauer){
+  dlg_message("Data not up to date, code will not run properly, please download todays excel from 
+              https://www.bag.admin.ch/bag/de/home/krankheiten/ausbrueche-epidemien-pandemien/aktuelle-ausbrueche-epidemien/novel-cov/situation-schweiz-und-international.html", type = c("ok"),
+              gui = .GUI)}
 
-
-# Match mit Schweizer Daten, korrelierend auf 1000 Faelle. DE: 1 Tag verschoben, IT 11 d verschoben, US 2 d verschoben
+# Match mit Schweizer Daten, korrelierend auf 1000 Faelle. DE: 3 Tag verschoben, IT 12 d verschoben, US 4 d verschoben
 # Quelle: JHU https://gisanddata.maps.arcgis.com/apps/opsdashboard/index.html#/bda7594740fd40299423467b48e9ecf6
-# -------- erste ca. 150 Tageszahlen --------------
-DEkum <- c(0, 0, 0, 0, 0, 0, 0, 0, 57, 150, 188, 240, 349, 534, 684, 847, 1150, 1565, 2369, 3062, 4838, 6012, 9352, 12327, 
+# -------- erste ca. 150 Tageszahlen fuer DE, IT, US --------------
+DEkum_ <- c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 57, 150, 188, 240, 349, 534, 684, 847, 1150, 1565, 2369, 3062, 4838, 6012, 9352, 12327, 
            15320,	19848, 22213, 24904, 30150, 33593, 39502, 47278, 53340, 58247, 62435, 67051, 72383, 77981, 84794, 91159,
            96108, 100132, 103375, 107663, 113296, 118235, 122171, 125834, 127854, 130072, 132210, 134753, 138135, 141397, 
            143724, 145743, 147065, 148453, 150729, 153129, 155418, 156513, 157770, 158841, 159912, 161539, 163009, 164077, 
@@ -62,7 +49,7 @@ DEkum <- c(0, 0, 0, 0, 0, 0, 0, 0, 57, 150, 188, 240, 349, 534, 684, 847, 1150, 
            192786, 193257, 193790, 194403, 194693, 194898, 195042, 195758, 196300, 196723, 197184, 197388, 197607, 198079, 
            198453, 198768, 199218, 199592, 199827, 199919, 200440, 200456, 201259, 201840, 202355, 202580, 202931, 203495, 
            203905, 204480, 205149, 205976, 206335)
-ITkum <- c(0, 0, 0, 0, 0, 0, 0, 0, 11, 76, 124, 229, 374, 528, 650, 888, 1100, 1700, 2000, 2502, 3089, 3858, 4636,  5883, 
+ITkum_ <- c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 76, 124, 229, 374, 528, 650, 888, 1100, 1700, 2000, 2502, 3089, 3858, 4636,  5883, 
            7375, 9172, 10149, 12462, 15061, 17660, 21157, 24747, 31506, 35713, 41035, 47021, 53578, 59138, 63927, 69176, 
            74386, 80598, 86498, 92472, 97689, 101739, 105792,  110574, 115242, 119827, 124632, 128948, 132547, 135586, 
            139422, 143626, 147577, 152271, 156363, 159516, 162488, 165155, 168941, 172434, 175925, 178972, 181228, 183957,
@@ -74,7 +61,7 @@ ITkum <- c(0, 0, 0, 0, 0, 0, 0, 0, 11, 76, 124, 229, 374, 528, 650, 888, 1100, 1
            240136, 240310, 240436, 240578, 240760, 240961, 241184, 241419, 241611, 241819, 241956, 242149, 242363, 242639,
            242827, 243061, 243230, 243344, 243506, 243736, 243967, 244216, 244434, 244624, 244752, 245032, 245338, 245590,
            245864)
-USkum <- c(15, 16, 51, 57, 58, 60, 68, 74, 98, 118, 149, 217, 262, 402, 518, 583, 959, 1300, 1700, 2200, 2700, 3500, 4600, 
+USkum_ <- c(0, 0, 15, 16, 51, 57, 58, 60, 68, 74, 98, 118, 149, 217, 262, 402, 518, 583, 959, 1300, 1700, 2200, 2700, 3500, 4600, 
            6400, 7800, 13700, 19100, 25500, 33300, 43800, 54935, 69197, 85996, 104837, 124686, 143055, 164610, 189633, 
            216772, 245573, 278458, 312245, 337646, 368449, 399929, 432438, 466299, 501615, 530830, 557590, 582594, 609685, 
            639664, 671425, 706779, 735287, 759786, 787960, 825306, 842624, 869172, 907096, 939249, 965933, 989258, 1012583,
@@ -86,18 +73,13 @@ USkum <- c(15, 16, 51, 57, 58, 60, 68, 74, 98, 118, 149, 217, 262, 402, 518, 583
            2422312, 2467837, 2510323, 2549069, 2590582, 2636538, 2686587, 2739879, 2795163, 2839917, 2888730, 2938624, 2996098,
            3055144, 3118168, 3184722, 3247782, 3304942, 3364547, 3431574, 3499398, 3576430, 3647715, 3712445, 3773260, 3830926,
            3902135, 3970908, 4038864, 4113224, 4178730) 
-# --------- neueste Tageszahlen --------------- 
-DEkum <- append(DEkum, c(206751))
-ITkum <- append(ITkum, c(246118))
-USkum <- append(USkum, c(4234140))
+# --------- neueste Tageszahlen fuer DE, IT, US --------------- 
+DEkum <- append(DEkum_, c(206751, 207382, 207960, 208819, 209736, 210676))
+ITkum <- append(ITkum_, c(246118, 246286, 246488, 246776, 247158, 247537))
+USkum <- append(USkum_, c(4234140, 4294770, 4352083, 4427493, 4495224, 4563262))
 
-# ---------- test if data is up to date --------
-if (length(CHkum) != dauer){
-  dlg_message("Data not up to date, code will not run properly", type = c("ok"),
-              gui = .GUI)}
-
-# Dataframe mit auf Schweizer Fallzahlen normierte Werte generieren
-corona_kum$CHkum <- CHkum
+# ---------- Dataframe mit auf CH Fallzahlen normierte Werte generieren (fuer Vergleich erste Welle) --------
+corona_kum$CHkum <- CH_data$`Fallzahlen pro Tag, kumuliert`
 corona_kum$DEkum <- DEkum[0:dauer]
 corona_kum$ITkum <- ITkum[0:dauer] 
 corona_kum$USkum <- USkum[0:dauer] 
@@ -133,15 +115,15 @@ rm(i)
 corona_CH <- corona_kum[ , c("datum", "CHkum")]
 corona_CH$CHtaegl <- corona_taegl$CHtaeglich
 
-corona_DE <- data.frame(datum = seq(as.Date("2020/03/04"), Sys.Date(), "days"))
+corona_DE <- data.frame(datum = seq(as.Date("2020/03/02"), Sys.Date(), "days"))
 corona_DE$DEkum <- DEkum[9:length(DEkum)]
 corona_DE$DEtaegl <- DEtaegl[9:length(DEkum)]
 
-corona_IT <- data.frame(datum = seq(as.Date("2020/02/23"), Sys.Date(), "days"))
+corona_IT <- data.frame(datum = seq(as.Date("2020/02/21"), Sys.Date(), "days"))
 corona_IT$ITkum <- ITkum[9:length(ITkum)]
 corona_IT$ITtaegl <- ITtaegl[9:length(ITkum)]
 
-corona_US <- data.frame(datum = seq(as.Date("2020/02/24"), Sys.Date(), "days"))
+corona_US <- data.frame(datum = seq(as.Date("2020/02/22"), Sys.Date(), "days"))
 corona_US$USkum <- USkum
 corona_US$UStaegl <- UStaegl
 

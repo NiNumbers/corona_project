@@ -2,6 +2,12 @@
 library(zoo) # for rollmean()
 load("corona_all_data.RData")
 
+# --------- einige simple plots -------
+par(mfrow = c(2,2))
+plot(CH_data$Datum, CH_data$`Fallzahlen pro Tag`, type = "h", xlab = "", ylab = "Faelle pro Tag")
+plot(CH_data$Datum, CH_data$`Hospitalisationen pro Tag`, type = "h", xlab = "", ylab = "Hostitalisationen pro Tag")
+plot(CH_data$Datum, CH_data$`Todesfälle pro Tag`, type = "h", xlab = "", ylab = "Todesfälle pro Tag")
+
 # ----------------- rolling average -------------
 corona_rollmean <- data.frame(datum = seq(as.Date("2020/02/26"), Sys.Date(), "days"))
 corona_rollmean$CHrollmean <- corona_rollmean$DErollmean <- corona_rollmean$ITrollmean <- corona_rollmean$USrollmean <- rep(0, dauer)

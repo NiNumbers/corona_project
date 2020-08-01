@@ -1,6 +1,6 @@
 load("corona_all_data.RData")
 
-from <- 7 # number of days in the past
+from <- 14 # number of days in the past
 to <- 0 # if 0: today
 
 # Mittelwert ueber die letzten Tage
