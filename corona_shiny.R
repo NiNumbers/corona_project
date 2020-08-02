@@ -1,4 +1,5 @@
 library(shiny)
+library(plotly)
 
 load("corona_shiny.RData")
 
@@ -27,9 +28,16 @@ ui <- fluidPage(
       )
     )
   ),
-  # show results  
-  plotOutput("show_all"),
-  plotOutput("show_zoom")
+  # show results
+  fluidRow(
+    plotOutput("show_all", hover = hoverOpts(id = "plot_hover_all"))),
+    fluidRow(
+    verbatimTextOutput("hover_all") 
+  ),
+  fluidRow(
+    plotOutput("show_zoom", hover = hoverOpts(id = "plot_hover"))),
+  
+  verbatimTextOutput("hover_zoom")
 )
 
 server <- function(input, output){
@@ -65,16 +73,35 @@ server <- function(input, output){
   })
   output$show_zoom <- renderPlot({
     plot(rv$datum[(length(rv$data)-21):length(rv$data)],
-         rv$data[(length(rv$data) - 21):length(rv$data)], log = rv$scal, 
-         ylab = rv$lab, xlab = "", type = "h", main = "3 weeks zoom", lwd = 3, 
+         rv$data[(length(rv$data) - 21):length(rv$data)], log = rv$scal,
+         ylim = c(0, max(rv$data[(length(rv$data) - 21):length(rv$data)])+10),
+         ylab = rv$lab, xlab = "", type = "h", main = "3 weeks zoom", lwd = 3,
          lend = 1, col = "darkgrey")
+    text(rv$datum[(length(rv$data)-21):length(rv$data)],
+         rv$data[(length(rv$data) - 21):length(rv$data)]+10, labels = rv$data[(length(rv$data) - 21):length(rv$data)])
     if (input$l_yes == TRUE){
-      lines(x = rv$datum, 
-            y = fitted(loess(rv$data ~ as.numeric(time(rv$datum)), 
-                             family = "symmetric", span = input$smooth)), 
+      lines(x = rv$datum,
+            y = fitted(loess(rv$data ~ as.numeric(time(rv$datum)),
+                             family = "symmetric", span = input$smooth)),
             col = "red", lty = 2, lwd = 2)
     }
   })
+  output$hover_all<- renderText({
+    if(!is.null(input$plot_hover_all)){
+      hover=input$plot_hover_all
+      plotdatum = as.Date(round(hover$x), origin = "1970-01-01")
+      outputArgs = c("Date: ", as.character(plotdatum), ", COVID-19 cases: ", rv$data[match(round(hover$x), rv$datum)])
+    }
+    else{outputArgs = c("Hover on graph to see daily values")}
+  })
+  output$hover_zoom<- renderText({
+    if(!is.null(input$plot_hover)){
+      hover=input$plot_hover
+      plotdatum = as.Date(round(hover$x), origin = "1970-01-01")
+      outputArgs = c("Date: ", as.character(plotdatum), ", COVID-19 cases: ", rv$data[match(round(hover$x), rv$datum)])
+    }
+    else{outputArgs = c("Hover on graph to see daily values")}
+})
 }
 
 shinyApp(server = server, ui = ui)
